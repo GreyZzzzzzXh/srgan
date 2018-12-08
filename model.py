@@ -41,8 +41,9 @@ def SRGAN_g(t_image, is_train=False, reuse=False):
         n = ElementwiseLayer([n, temp], tf.add, name='add3')
         # B residual blacks end
 
-        n = Conv2d(n, 256, (3, 3), (1, 1), act=None, padding='SAME', W_init=w_init, name='n256s1/1')
-        n = SubpixelConv2d(n, scale=2, n_out_channel=None, act=tf.nn.relu, name='pixelshufflerx2/1')
+        ''' fuse relu into conv2d '''
+        n = Conv2d(n, 256, (3, 3), (1, 1), act=tf.nn.relu, padding='SAME', W_init=w_init, name='n256s1/1')
+        n = SubpixelConv2d(n, scale=2, n_out_channel=None, act=None, name='pixelshufflerx2/1')
         ''' 
         SubpixelConv2d is same with tf.depth_to_space,
         but depth_to_space is not supported in tflite.
@@ -56,8 +57,8 @@ def SRGAN_g(t_image, is_train=False, reuse=False):
             X = tf.transpose(X, [3, 1, 2, 0])
         '''
 
-        n = Conv2d(n, 256, (3, 3), (1, 1), act=None, padding='SAME', W_init=w_init, name='n256s1/2')
-        n = SubpixelConv2d(n, scale=2, n_out_channel=None, act=tf.nn.relu, name='pixelshufflerx2/2')
+        n = Conv2d(n, 256, (3, 3), (1, 1), act=tf.nn.relu, padding='SAME', W_init=w_init, name='n256s1/2')
+        n = SubpixelConv2d(n, scale=2, n_out_channel=None, act=None, name='pixelshufflerx2/2')
 
         n = Conv2d(n, 3, (1, 1), (1, 1), act=tf.nn.tanh, padding='SAME', W_init=w_init, name='out')
         return n
