@@ -43,6 +43,18 @@ def SRGAN_g(t_image, is_train=False, reuse=False):
 
         n = Conv2d(n, 256, (3, 3), (1, 1), act=None, padding='SAME', W_init=w_init, name='n256s1/1')
         n = SubpixelConv2d(n, scale=2, n_out_channel=None, act=tf.nn.relu, name='pixelshufflerx2/1')
+        ''' 
+        SubpixelConv2d is same with tf.depth_to_space,
+        but depth_to_space is not supported in tflite.
+        so here i revised tl source code.
+        use tf.transpose() and tf.batch_to_space_nd() to replace.
+
+            # X = tf.depth_to_space(X, r)
+            # ===================================================
+            X = tf.transpose(X, [3, 1, 2, 0])
+            X = tf.batch_to_space_nd(X, [r, r], [[0, 0], [0, 0]])
+            X = tf.transpose(X, [3, 1, 2, 0])
+        '''
 
         n = Conv2d(n, 256, (3, 3), (1, 1), act=None, padding='SAME', W_init=w_init, name='n256s1/2')
         n = SubpixelConv2d(n, scale=2, n_out_channel=None, act=tf.nn.relu, name='pixelshufflerx2/2')

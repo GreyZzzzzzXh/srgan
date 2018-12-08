@@ -106,7 +106,7 @@ def train():
     ###========================== RESTORE MODEL =============================###
     sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
     tl.layers.initialize_global_variables(sess)
-    if tl.files.load_and_assign_npz(sess=sess, name=checkpoint_dir + '/g_{}.npz'.format(tl.global_flag['mode']), network=net_g) is False:
+    if tl.files.load_and_assign_npz(sess=sess, name=checkpoint_dir + '/g_{}.npz'.format(tl.global_flag['mode']), network=net_g) is None:
         tl.files.load_and_assign_npz(sess=sess, name=checkpoint_dir + '/g_{}_init.npz'.format(tl.global_flag['mode']), network=net_g)
     tl.files.load_and_assign_npz(sess=sess, name=checkpoint_dir + '/d_{}.npz'.format(tl.global_flag['mode']), network=net_d)
 
@@ -281,19 +281,30 @@ def evaluate():
     tl.layers.initialize_global_variables(sess)
     tl.files.load_and_assign_npz(sess=sess, name=checkpoint_dir + '/g_srgan.npz', network=net_g)
 
+    '''
+    Data is saved as npz. while training,
+    now we need .pb and .ckpt.
+    '''
+    # save pb.
+    # tf.train.write_graph(sess.graph_def, checkpoint_dir, 'graph.pb', as_text=False)
+    # save ckpt.
+    # tl.files.save_ckpt(sess=sess, mode_name='model.ckpt', save_dir=checkpoint_dir)
+    # restore from ckpt.
+    # tl.files.load_ckpt(sess=sess, mode_name='model.ckpt', save_dir=checkpoint_dir)
+
     ###======================= EVALUATION =============================###
     start_time = time.time()
-    out = sess.run(net_g.outputs, {t_image: [valid_lr_img]})
+    out = sess.run(net_g.outputs, {t_image: [valid_lr_img]})    # range [-1, 1]
     print("took: %4.4fs" % (time.time() - start_time))
 
     print("LR size: %s /  generated HR size: %s" % (size, out.shape))  # LR size: (339, 510, 3) /  gen HR size: (1, 1356, 2040, 3)
     print("[*] save images")
-    tl.vis.save_image(out[0], save_dir + '/valid_gen.png')
-    tl.vis.save_image(valid_lr_img, save_dir + '/valid_lr.png')
-    tl.vis.save_image(valid_hr_img, save_dir + '/valid_hr.png')
+    tl.vis.save_image(out[0], save_dir + '/valid_gen.png')       # range [-1, 1] 
+    tl.vis.save_image(valid_lr_img, save_dir + '/valid_lr.png')  # range [-1, 1]
+    tl.vis.save_image(valid_hr_img, save_dir + '/valid_hr.png')  # range [0, 255]
 
     out_bicu = scipy.misc.imresize(valid_lr_img, [size[0] * 4, size[1] * 4], interp='bicubic', mode=None)
-    tl.vis.save_image(out_bicu, save_dir + '/valid_bicubic.png')
+    tl.vis.save_image(out_bicu, save_dir + '/valid_bicubic.png') # range [0, 255]
 
 
 if __name__ == '__main__':

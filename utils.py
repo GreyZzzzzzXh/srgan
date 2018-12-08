@@ -23,6 +23,7 @@ def crop_sub_imgs_fn(x, is_random=True):
 def downsample_fn(x):
     # We obtained the LR images by downsampling the HR images using bicubic kernel with downsampling factor r = 4.
     x = imresize(x, size=[96, 96], interp='bicubic', mode=None)
+    ''' Why here rescale again? while training... '''
     x = x / (255. / 2.)
     x = x - 1.
     # x = (x - 0.5)*2
