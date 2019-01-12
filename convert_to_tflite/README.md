@@ -1,13 +1,12 @@
 Copy ***model.ckpt*** and ***graph.pb*** here.
 
-Copy ```${tensorflow_dir}/lib/python3.5/site-packages/tensorflow/python/tools/freeze_graph.py``` here.
 
 Then:
 
 ## freeze:
 
 ```
-python3 freeze_graph.py \
+python3 -m tensorflow.python.tools.freeze_graph \
 --input_graph=graph.pb \
 --input_checkpoint=model.ckpt \
 --input_binary=true \
