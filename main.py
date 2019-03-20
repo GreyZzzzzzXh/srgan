@@ -285,12 +285,9 @@ def evaluate():
     Data is saved as npz. while training,
     now we need .pb and .ckpt.
     '''
-    # save pb.
-    # tf.train.write_graph(sess.graph_def, checkpoint_dir, 'graph.pb', as_text=False)
-    # save ckpt.
-    # tl.files.save_ckpt(sess=sess, mode_name='model.ckpt', save_dir=checkpoint_dir)
-    # restore from ckpt.
-    # tl.files.load_ckpt(sess=sess, mode_name='model.ckpt', save_dir=checkpoint_dir)
+    # save pb. and ckpt
+    tf.train.write_graph(sess.graph_def, checkpoint_dir, 'graph.pb', as_text=False)
+    tl.files.save_ckpt(sess=sess, mode_name='model.ckpt', save_dir=checkpoint_dir)
 
     ###======================= EVALUATION =============================###
     start_time = time.time()
